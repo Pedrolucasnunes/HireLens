@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HireLens — Recrutamento com Inteligência Artificial. Analise currículos, ranqueie candidatos e contrate mais rápido com IA." />
+  <title>HireLens — Inteligência em Recrutamento com IA</title>
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     MODAL DE WAITLIST
+     ════════════════════════════════════════════ -->
+<div id="waitlist-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-live="polite">
+  <div class="modal-box">
+
+    <button id="modal-close-btn" class="modal-close" aria-label="Fechar modal">×</button>
+
+    <!-- ── Estado: formulário ── -->
+    <div id="modal-form-state" class="modal-form-state">
+
+      <div class="modal-tag-wrap">
+        <span id="modal-tag-text" class="tag"></span>
+      </div>
+
+      <h2 id="modal-title" class="modal-title"></h2>
+      <p id="modal-subtitle" class="modal-subtitle"></p>
+
+      <div id="modal-plan-badge" class="modal-plan-badge" aria-hidden="true"></div>
+
+      <div class="modal-fields">
+        <input
+          id="modal-name"
+          class="modal-input"
+          type="text"
+          placeholder="Seu nome completo"
+          autocomplete="name"
+          aria-label="Nome completo"
+        />
+        <input
+          id="modal-email"
+          class="modal-input"
+          type="email"
+          placeholder="Seu melhor e-mail"
+          autocomplete="email"
+          aria-label="E-mail"
+          aria-describedby="modal-error"
+        />
+        <input
+          id="modal-company"
+          class="modal-input"
+          type="text"
+          placeholder="Nome da empresa"
+          autocomplete="organization"
+          aria-label="Empresa"
+        />
+
+        <p id="modal-error" class="modal-error" role="alert" aria-live="assertive"></p>
+
+        <button id="modal-submit-btn" class="modal-submit" type="button">
+          <span class="modal-submit__label"></span>
+          <span class="modal-submit__spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <p class="modal-disclaimer">
+        Sem spam. Sem compromisso. Apenas acesso antes de todos.
+      </p>
+    </div>
+
+    <!-- ── Estado: sucesso ── -->
+    <div id="modal-success-state" class="modal-success" role="status" aria-live="polite">
+
+      <div class="modal-success__glow" aria-hidden="true"></div>
+
+      <div class="modal-success__icon-wrap" aria-hidden="true">
+        <div class="modal-success__icon-ring"></div>
+        <div class="modal-success__icon">🚀</div>
+      </div>
+
+      <h3 class="modal-success__title">Você está na lista 🚀</h3>
+
+      <p class="modal-success__sub">
+        Estamos liberando o HireLens aos poucos e você já está na frente.<br>
+        Assim que o acesso estiver disponível, entraremos em contato.
+      </p>
+
+      <div class="modal-success__proof">
+        <span class="modal-success__proof-dot" aria-hidden="true"></span>
+        <span id="modal-success-position" class="modal-success__proof-text"></span>
+      </div>
+
+      <div class="modal-success__actions">
+        <button class="modal-success__cta" onclick="handleSuccessCTA()">
+          Ver como funciona →
+        </button>
+        <button class="modal-success__close" onclick="closeModal()">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ── Estado: erro de rede ── -->
+    <div id="modal-network-error" class="modal-network-error" role="alert" aria-live="assertive">
+      <div class="modal-network-error__icon" aria-hidden="true">⚠</div>
+      <p class="modal-network-error__text">
+        Algo deu errado. Verifique sua conexão e tente novamente.
+      </p>
+      <button class="modal-network-error__retry" id="modal-retry-btn" type="button">
+        Tentar novamente
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     NAVEGAÇÃO
+     ════════════════════════════════════════════ -->
+<nav id="main-nav" class="nav" role="navigation" aria-label="Navegação principal">
+  <div class="nav__inner">
+    <div class="logo" aria-label="HireLens">
+      Hire<span class="logo__accent">Lens</span>
+    </div>
+
+    <ul class="nav__links">
+      <li><a href="#features">Funcionalidades</a></li>
+      <li><a href="#how">Como Funciona</a></li>
+      <li><a href="#pricing">Planos</a></li>
+      <li><a href="#" onclick="openModal('login'); return false;">Entrar</a></li>
+    </ul>
+
+    <button class="nav__cta" onclick="openModal('Growth')">Começar Grátis</button>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════════
+     HERO
+     ════════════════════════════════════════════ -->
+<section class="hero" aria-label="Apresentação">
+  <div class="hero__grid-bg" aria-hidden="true"></div>
+  <div class="hero__glow"     aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="hero__eyebrow">
+      <span class="tag">Recrutamento com Inteligência Artificial</span>
+    </div>
+
+    <h1 class="hero__headline">
+      Pare de contratar<br>
+      <em>as pessoas</em>
+      <span class="outline-text">erradas.</span>
+    </h1>
+
+    <p class="hero__sub">
+      O HireLens lê cada currículo em segundos, pontua cada candidato com precisão
+      e revela a contratação certa — antes que seus concorrentes sequer os liguem.
+    </p>
+
+    <div class="hero__actions">
+      <button class="btn-primary" onclick="openModal('Growth')">Quero Acesso Antecipado</button>
+      <button class="btn-ghost"   onclick="openModal('demo')">Ver Demonstração →</button>
+    </div>
+
+    <div class="hero__proof">
+      <div class="proof-avatars" aria-hidden="true">
+        <div class="proof-avatar" style="background:#e8a840;">M</div>
+        <div class="proof-avatar" style="background:#3ea87a;">S</div>
+        <div class="proof-avatar" style="background:#c94b3e;">A</div>
+        <div class="proof-avatar" style="background:#5a82d6;">J</div>
+        <div class="proof-avatar" style="background:#b07e28;">R</div>
+      </div>
+      <p class="proof-text"><strong>+2.400 empresas</strong> contrataram melhor este mês</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     TICKER
+     ════════════════════════════════════════════ -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>ANÁLISE DE CURRÍCULOS EM SEGUNDOS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>RANKING DE CANDIDATOS COM IA</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>TRIAGEM SEM VIÉS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>UPLOAD E LEITURA EM MASSA</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>SHORTLIST INTELIGENTE</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>INTELIGÊNCIA DE ENTREVISTAS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>INTEGRAÇÃO COM ATS</span>
+    <!-- Duplicata para animação contínua -->
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>ANÁLISE DE CURRÍCULOS EM SEGUNDOS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>RANKING DE CANDIDATOS COM IA</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>TRIAGEM SEM VIÉS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>UPLOAD E LEITURA EM MASSA</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>SHORTLIST INTELIGENTE</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>INTELIGÊNCIA DE ENTREVISTAS</span>
+    <span class="ticker-item"><span class="ticker-item__icon">✦</span>INTEGRAÇÃO COM ATS</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     O PROBLEMA
+     ════════════════════════════════════════════ -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="tag tag--danger">O Problema</span>
+      <h2 class="section-title">Seu processo atual<br>está custando talentos.</h2>
+    </div>
+
+    <div class="problem-grid">
+      <article class="problem-card reveal">
+        <div class="problem-card__num">01 — VOLUME</div>
+        <h3>Centenas de currículos. Zero tempo.</h3>
+        <p>Recrutadores gastam até 23 segundos por currículo. Com 500 candidaturas por vaga, isso são 190 horas por contratação — desperdiçadas em triagem, não em contratação.</p>
+      </article>
+
+      <article class="problem-card reveal">
+        <div class="problem-card__num">02 — VIÉS</div>
+        <h3>Intuição não é estratégia de contratação.</h3>
+        <p>O viés inconsciente filtra candidatos qualificados antes mesmo de serem vistos. Você não está contratando os melhores — está contratando os mais familiares.</p>
+      </article>
+
+      <article class="problem-card reveal">
+        <div class="problem-card__num">03 — VELOCIDADE</div>
+        <h3>Seus melhores candidatos somem.</h3>
+        <p>Os talentos top saem do mercado em 10 dias. Seu processo lento significa que sua melhor contratação acabou de assinar com outra empresa enquanto você ainda revisava planilhas.</p>
+      </article>
+
+      <article class="problem-card reveal">
+        <div class="problem-card__num">04 — PRECISÃO</div>
+        <h3>Uma contratação errada custa mais do que você imagina.</h3>
+        <p>O custo médio de uma má contratação é 30% do salário anual. Multiplique isso pela sua equipe. Agora pergunte: você pode continuar apostando no escuro?</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     A SOLUÇÃO
+     ════════════════════════════════════════════ -->
+<section class="section section--bordered" id="solution">
+  <div class="container">
+    <div class="solution-wrap">
+
+      <!-- Texto -->
+      <div class="solution-text reveal">
+        <span class="tag">A Solução</span>
+        <h2 class="section-title">Inteligência em<br>cada etapa da<br>contratação.</h2>
+        <p>O HireLens não substitui sua equipe — ele a torna imbatível. Cada currículo pontuado. Cada sinal identificado. Cada decisão respaldada por dados.</p>
+        <p>Desde o momento em que um candidato se inscreve, nossa IA está lendo, ranqueando e raciocinando — para que seus recrutadores foquem no que só humanos fazem: fechar.</p>
+
+        <div class="solution-stats">
+          <div class="stat-box reveal">
+            <div class="stat-box__num">87%</div>
+            <div class="stat-box__label">Redução no tempo de triagem</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-box__num">3×</div>
+            <div class="stat-box__label">Mais rápido para contratar</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-box__num">94%</div>
+            <div class="stat-box__label">Satisfação dos gestores</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-box__num">2.1×</div>
+            <div class="stat-box__label">Melhora na retenção</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard preview -->
+      <div class="dashboard-visual reveal" aria-label="Preview do produto HireLens">
+        <div class="scan-line" aria-hidden="true"></div>
+
+        <div class="dash-topbar" aria-hidden="true">
+          <div class="dash-dot" style="background:#c94b3e;"></div>
+          <div class="dash-dot" style="background:#e8a840;"></div>
+          <div class="dash-dot" style="background:#3ea87a;"></div>
+          <span class="dash-url">app.hirelens.ai / pipeline</span>
+        </div>
+
+        <div class="dash-body">
+          <div class="dash-header-row">
+            <div class="dash-title-group">
+              <h4>Designer de Produto Sênior</h4>
+              <span>247 candidatos · Atualizado agora</span>
+            </div>
+            <div class="dash-badge">Ranqueado por IA</div>
+          </div>
+
+          <ul class="candidate-list">
+            <li class="candidate-row">
+              <span class="cand-rank">01</span>
+              <div class="cand-avatar" style="background:#5a82d6;" aria-hidden="true">SA</div>
+              <div class="cand-info">
+                <div class="cand-name">Sara Adamova</div>
+                <div class="cand-role">Ex-Figma · 8 anos exp</div>
+              </div>
+              <div class="cand-score-bar" aria-label="Score: 96">
+                <div class="cand-bar-track"><div class="cand-bar-fill" style="--w:96%;"></div></div>
+                <div class="cand-score-num">96</div>
+              </div>
+              <div class="cand-tags">
+                <span class="cand-tag">Design Sys</span>
+                <span class="cand-tag">B2B SaaS</span>
+              </div>
+            </li>
+
+            <li class="candidate-row">
+              <span class="cand-rank">02</span>
+              <div class="cand-avatar" style="background:#3ea87a;" aria-hidden="true">MK</div>
+              <div class="cand-info">
+                <div class="cand-name">Marcus Klein</div>
+                <div class="cand-role">Ex-Stripe · 6 anos exp</div>
+              </div>
+              <div class="cand-score-bar" aria-label="Score: 91">
+                <div class="cand-bar-track"><div class="cand-bar-fill" style="--w:91%;"></div></div>
+                <div class="cand-score-num">91</div>
+              </div>
+              <div class="cand-tags">
+                <span class="cand-tag">Fintech</span>
+                <span class="cand-tag">Research</span>
+              </div>
+            </li>
+
+            <li class="candidate-row">
+              <span class="cand-rank">03</span>
+              <div class="cand-avatar" style="background:#e8a840;" aria-hidden="true">PJ</div>
+              <div class="cand-info">
+                <div class="cand-name">Priya Joshi</div>
+                <div class="cand-role">Ex-Airbnb · 5 anos exp</div>
+              </div>
+              <div class="cand-score-bar" aria-label="Score: 88">
+                <div class="cand-bar-track"><div class="cand-bar-fill" style="--w:88%;"></div></div>
+                <div class="cand-score-num">88</div>
+              </div>
+              <div class="cand-tags">
+                <span class="cand-tag">Mobile</span>
+                <span class="cand-tag">0→1</span>
+              </div>
+            </li>
+
+            <li class="candidate-row">
+              <span class="cand-rank">04</span>
+              <div class="cand-avatar" style="background:#9b59b6;" aria-hidden="true">LR</div>
+              <div class="cand-info">
+                <div class="cand-name">Leo Russo</div>
+                <div class="cand-role">Ex-Notion · 4 anos exp</div>
+              </div>
+              <div class="cand-score-bar" aria-label="Score: 81">
+                <div class="cand-bar-track"><div class="cand-bar-fill" style="--w:81%;"></div></div>
+                <div class="cand-score-num">81</div>
+              </div>
+              <div class="cand-tags">
+                <span class="cand-tag">SaaS</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     FUNCIONALIDADES
+     ════════════════════════════════════════════ -->
+<section class="section section--bordered" id="features">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="tag">Funcionalidades</span>
+      <h2 class="section-title">Feito para precisão.<br>Desenhado para velocidade.</h2>
+    </div>
+
+    <div class="features-grid">
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F01</span>
+        <div class="feature-card__icon" aria-hidden="true">📄</div>
+        <h3>Leitura Instantânea de Currículos</h3>
+        <p>Faça upload de 500 currículos de uma vez. O HireLens extrai competências, experiência, formação e intenção em menos de 3 segundos por candidato. Qualquer formato, qualquer idioma.</p>
+      </article>
+
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F02</span>
+        <div class="feature-card__icon" aria-hidden="true">🧠</div>
+        <h3>Pontuação de Match com IA</h3>
+        <p>Cada candidato recebe uma pontuação multidimensional frente aos requisitos da vaga — não apenas palavras-chave. Contexto, trajetória e sinais culturais incluídos.</p>
+      </article>
+
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F03</span>
+        <div class="feature-card__icon" aria-hidden="true">⚡</div>
+        <h3>Shortlist Inteligente</h3>
+        <p>Seu top 10 está pronto antes do primeiro café. Gestão de pipeline com drag-and-drop e movimentação de etapas em um clique.</p>
+      </article>
+
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F04</span>
+        <div class="feature-card__icon" aria-hidden="true">📊</div>
+        <h3>Analytics de Contratação</h3>
+        <p>Dashboards em tempo real mostram saúde do pipeline, tendências de tempo de preenchimento, qualidade das fontes e performance do time.</p>
+      </article>
+
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F05</span>
+        <div class="feature-card__icon" aria-hidden="true">🔗</div>
+        <h3>Integração com ATS</h3>
+        <p>Funciona com Greenhouse, Lever, Workday e mais de 40 outras plataformas. Sem novo fluxo — apenas inteligência superior sobre o que você já usa.</p>
+      </article>
+
+      <article class="feature-card reveal">
+        <span class="feature-card__num">F06</span>
+        <div class="feature-card__icon" aria-hidden="true">🛡️</div>
+        <h3>Redução de Viés</h3>
+        <p>Sinais demográficos são filtrados por padrão. O HireLens pontua o que importa: competências, experiência e aderência. Em conformidade com LGPD, GDPR e normas globais.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     COMO FUNCIONA
+     ════════════════════════════════════════════ -->
+<section class="section section--bordered section--alt" id="how">
+  <div class="container">
+    <div class="section-header section-header--center reveal">
+      <span class="tag">Processo</span>
+      <h2 class="section-title">Três etapas.<br>Zero fricção.</h2>
+    </div>
+
+    <div class="steps-wrap">
+      <div class="step reveal">
+        <div class="step__circle" aria-hidden="true">1</div>
+        <h3>Envie seu Pipeline</h3>
+        <p>Solte a descrição da vaga e os currículos — ou conecte seu ATS para sincronização ao vivo. O HireLens começa a ler em tempo real.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step__circle" aria-hidden="true">2</div>
+        <h3>IA Pontua e Ranqueia</h3>
+        <p>Cada candidato é avaliado em mais de 40 sinais: competências, experiência, alinhamento cultural e trajetória de carreira. Resultados explicados — sem caixa-preta.</p>
+      </div>
+
+      <div class="step reveal">
+        <div class="step__circle" aria-hidden="true">3</div>
+        <h3>Contrate com Confiança</h3>
+        <p>Revise seu shortlist, compartilhe com o time e avance os candidatos. Tempo médio do upload à entrevista: 4 horas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     BENEFÍCIOS
+     ════════════════════════════════════════════ -->
+<section class="section section--bordered" id="benefits">
+  <div class="container">
+    <div class="benefits-wrap">
+
+      <!-- Lista de benefícios -->
+      <div>
+        <div class="section-header reveal">
+          <span class="tag">Por que HireLens</span>
+          <h2 class="section-title">Toda vantagem<br>que você<br>merece.</h2>
+        </div>
+
+        <ul class="benefits-list">
+          <li class="benefit-item reveal">
+            <span class="benefit-item__num">—01</span>
+            <div>
+              <h4>Tempo de Volta, Finalmente</h4>
+              <p>Elimine o gargalo de triagem manual. Seu time foca em entrevistas, relacionamentos e fechamentos — não em planilhas.</p>
+            </div>
+          </li>
+
+          <li class="benefit-item reveal">
+            <span class="benefit-item__num">—02</span>
+            <div>
+              <h4>Chegue Primeiro, Não Por Último</h4>
+              <p>Mova-se em horas, não semanas. Seja o primeiro a contatar os candidatos que seus concorrentes ainda estão tentando classificar.</p>
+            </div>
+          </li>
+
+          <li class="benefit-item reveal">
+            <span class="benefit-item__num">—03</span>
+            <div>
+              <h4>Decisões com Evidências</h4>
+              <p>Cada contratação é respaldada por dados. Apresente seu shortlist à liderança com pontuações completas e raciocínio da IA.</p>
+            </div>
+          </li>
+
+          <li class="benefit-item reveal">
+            <span class="benefit-item__num">—04</span>
+            <div>
+              <h4>Escale sem Aumentar Headcount</h4>
+              <p>Uma equipe de 3 consegue o volume de trabalho de 12. O HireLens é o multiplicador de força que cresce com seu volume de contratações.</p>
+            </div>
+          </li>
+
+          <li class="benefit-item reveal">
+            <span class="benefit-item__num">—05</span>
+            <div>
+              <h4>Melhores Contratações Ficam Mais Tempo</h4>
+              <p>Match preciso gera maior aderência cultural e funcional. Nossos clientes relatam melhora de 2.1× na retenção em 12 meses.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Callout de métricas -->
+      <aside class="benefits-callout reveal">
+        <div class="callout__metric">4hrs</div>
+        <div class="callout__label">Tempo médio do upload à primeira entrevista</div>
+        <p class="callout__sub">Antes do HireLens, equipes gastavam 11 dias só para montar um shortlist. Nossos clientes fazem isso antes do almoço.</p>
+        <div class="callout__divider"></div>
+        <div class="callout__mini-stat">
+          <div class="callout__mini-val">R$92.000</div>
+          <div class="callout__mini-label">Economia média por contratação vs. triagem tradicional</div>
+        </div>
+        <div class="callout__mini-stat">
+          <div class="callout__mini-val">500+</div>
+          <div class="callout__mini-label">Currículos processados por vaga em média</div>
+        </div>
+        <div class="callout__mini-stat">
+          <div class="callout__mini-val">99.7%</div>
+          <div class="callout__mini-label">SLA de uptime para planos enterprise</div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     PLANOS (PRÉ-LANÇAMENTO)
+     ════════════════════════════════════════════ -->
+<section class="section section--bordered section--alt" id="pricing">
+  <div class="container">
+    <div class="section-header section-header--center reveal">
+      <span class="tag">Planos</span>
+      <h2 class="section-title">Escolha seu plano.<br>Garanta sua vaga.</h2>
+      <p class="pricing-pre-launch-note">
+        Estamos em <strong>acesso antecipado</strong>. Garanta sua vaga na lista de espera
+        e seja um dos primeiros a transformar suas contratações com IA.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Plano Starter -->
+      <div class="pricing-card reveal">
+        <div class="pricing-card__tier">Starter</div>
+        <span class="plan-status-badge plan-status-badge--muted">Em Breve</span>
+        <p class="plan-description">Ideal para pequenas empresas que querem começar a contratar com mais inteligência.</p>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Até 10 vagas ativas</li>
+          <li>500 currículos / mês</li>
+          <li>Pontuação e ranking com IA</li>
+          <li>Gestão de candidatos</li>
+          <li>Pipeline de contratação</li>
+          <li class="unavailable">Integrações com ATS</li>
+          <li class="unavailable">Dashboard de analytics</li>
+        </ul>
+        <button class="pricing-btn pricing-btn--outline" onclick="openModal('Starter')">Entrar na lista</button>
+      </div>
+
+      <!-- Plano Growth (destaque) -->
+      <div class="pricing-card pricing-card--featured reveal">
+        <div class="pricing-card__badge">MAIS POPULAR</div>
+        <div class="pricing-card__tier">Growth</div>
+        <span class="plan-status-badge plan-status-badge--featured">Acesso Antecipado</span>
+        <p class="plan-description">Para equipes que querem escalar contratações com IA e tomar decisões baseadas em dados.</p>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Vagas ilimitadas</li>
+          <li>5.000 currículos / mês</li>
+          <li>Pontuação e ranking com IA</li>
+          <li>Gestão completa de candidatos</li>
+          <li>Pipeline de contratação avançado</li>
+          <li>Dashboard completo de analytics</li>
+          <li>Integrações com ATS (+40)</li>
+        </ul>
+        <button class="pricing-btn pricing-btn--filled" onclick="openModal('Growth')">Quero acesso antecipado</button>
+      </div>
+
+      <!-- Plano Enterprise -->
+      <div class="pricing-card reveal">
+        <div class="pricing-card__tier">Enterprise</div>
+        <span class="plan-status-badge plan-status-badge--muted">Sob Consulta</span>
+        <p class="plan-description">Solução personalizada para grandes operações com alto volume de contratações.</p>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Tudo ilimitado</li>
+          <li>Modelo de IA customizado</li>
+          <li>Pipeline de contratação dedicado</li>
+          <li>SSO &amp; provisionamento SCIM</li>
+          <li>Analytics e relatórios avançados</li>
+          <li>Logs de auditoria &amp; conformidade</li>
+          <li>CSM &amp; SLA de 99,9%</li>
+        </ul>
+        <button class="pricing-btn pricing-btn--outline" onclick="openModal('Enterprise')">Falar com vendas</button>
+      </div>
+
+    </div>
+
+    <!-- Faixa de prova social -->
+    <div class="proof-strip reveal">
+      <div class="proof-strip__item">
+        <div class="proof-strip__value">+340</div>
+        <div class="proof-strip__label">empresas na lista</div>
+      </div>
+      <div class="proof-strip__divider" aria-hidden="true"></div>
+      <div class="proof-strip__item">
+        <div class="proof-strip__value">14 dias</div>
+        <div class="proof-strip__label">trial gratuito no lançamento</div>
+      </div>
+      <div class="proof-strip__divider" aria-hidden="true"></div>
+      <div class="proof-strip__item">
+        <div class="proof-strip__value">Sem cartão</div>
+        <div class="proof-strip__label">para entrar na lista</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     CTA FINAL
+     ════════════════════════════════════════════ -->
+<section class="final-cta" id="cta">
+  <div class="final-cta__bg" aria-hidden="true"></div>
+  <div class="container">
+    <h2 class="reveal">
+      Sua próxima grande<br>contratação já está<br><em>na sua caixa de entrada.</em>
+    </h2>
+    <p class="reveal">
+      Pare de deixar talentos escaparem pelas brechas de um processo quebrado.
+      Comece grátis. Veja resultados no seu primeiro pipeline.
+    </p>
+    <div class="cta-actions reveal">
+      <button class="btn-primary" onclick="openModal('Growth')">Quero Acesso Antecipado</button>
+      <button class="btn-ghost"   onclick="openModal('demo')">Agendar Demonstração ao Vivo</button>
+    </div>
+    <p class="cta-note reveal">Sem cartão de crédito · Acesso gradual · Cancele quando quiser</p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════
+     RODAPÉ
+     ════════════════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="logo">
+        Hire<span class="logo__accent">Lens</span>
+        <span class="logo__copy">© 2025</span>
+      </div>
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+        <a href="#">Segurança</a>
+        <a href="#">Documentação</a>
+        <a href="#">Status</a>
+        <a href="#">Contato</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+
+<!-- Supabase — CDN (deve vir ANTES de script.js) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<!-- Scripts — carregado no final para não bloquear renderização -->
+<script src="script.js"></script>
+</body>
+</html>
