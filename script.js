@@ -1,5 +1,5 @@
 /**
- * HireLens — script.js
+ * TalentLens — script.js
  *
  * Módulos:
  *  1. Navegação (scroll + highlight)
@@ -161,8 +161,8 @@ const MODAL_CONFIGS = {
   },
   demo: {
     tag:      '◆ Demonstração',
-    title:    'Veja o HireLens<br><em>em ação.</em>',
-    subtitle: 'Agende uma demonstração ao vivo com nosso time e veja como o HireLens transforma seu processo de contratação.',
+    title:    'Veja o TalentLens<br><em>em ação.</em>',
+    subtitle: 'Agende uma demonstração ao vivo com nosso time e veja como o TalentLens transforma seu processo de contratação.',
     badge:    null,
     btnLabel: 'Agendar demonstração →',
   },
