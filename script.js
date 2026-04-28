@@ -187,8 +187,10 @@ const modal = {
   planBadge:     document.getElementById('modal-plan-badge'),
   nameInput:     document.getElementById('modal-name'),
   emailInput:    document.getElementById('modal-email'),
-  companyInput:  document.getElementById('modal-company'),
-  errorMsg:      document.getElementById('modal-error'),
+  companyInput:   document.getElementById('modal-company'),
+  feedbackToggle: document.getElementById('modal-feedback-toggle'),
+  feedbackInput:  document.getElementById('modal-feedback'),
+  errorMsg:       document.getElementById('modal-error'),
   submitBtn:     document.getElementById('modal-submit-btn'),
   submitLabel:   document.querySelector('#modal-submit-btn .modal-submit__label'),
   // success state
@@ -284,6 +286,9 @@ function resetModal() {
   modal.nameInput.value    = '';
   modal.emailInput.value   = '';
   modal.companyInput.value = '';
+  modal.feedbackInput.value = '';
+  modal.feedbackInput.classList.remove('is-open');
+  modal.feedbackToggle.setAttribute('aria-expanded', 'false');
   clearFieldError();
 
   // Restaura botão
@@ -407,10 +412,11 @@ async function submitToAPI(data) {
     .from('leads')
     .insert([
       {
-        name:    data.name    || null,
-        email:   data.email,
-        company: data.company || null,
-        plan:    data.plan,
+        name:     data.name     || null,
+        email:    data.email,
+        company:  data.company  || null,
+        plan:     data.plan,
+        feedback: data.feedback || null,
       },
     ]);
 
@@ -425,9 +431,10 @@ async function submitToAPI(data) {
  * Valida → loading → chama API → sucesso ou erro.
  */
 function handleModalSubmit() {
-  const email   = modal.emailInput.value.trim();
-  const name    = modal.nameInput.value.trim();
-  const company = modal.companyInput.value.trim();
+  const email    = modal.emailInput.value.trim();
+  const name     = modal.nameInput.value.trim();
+  const company  = modal.companyInput.value.trim();
+  const feedback = modal.feedbackInput.value.trim();
 
   // Validação de e-mail
   if (!email) {
@@ -445,7 +452,7 @@ function handleModalSubmit() {
   clearFieldError();
   setSubmitLoading();
 
-  submitToAPI({ name, email, company, plan: activePlan })
+  submitToAPI({ name, email, company, feedback, plan: activePlan })
     .then(() => {
       showSuccess();
     })
@@ -481,6 +488,13 @@ function initModalEvents() {
     if (e.key === 'Escape' && modal.overlay.classList.contains('is-open')) {
       closeModal();
     }
+  });
+
+  // Toggle de feedback
+  modal.feedbackToggle.addEventListener('click', () => {
+    const isOpen = modal.feedbackInput.classList.toggle('is-open');
+    modal.feedbackToggle.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) modal.feedbackInput.focus();
   });
 
   // Enviar

@@ -68,6 +68,19 @@
 
         <p id="modal-error" class="modal-error" role="alert" aria-live="assertive"></p>
 
+        <div class="modal-feedback-wrap">
+          <button type="button" class="modal-feedback-toggle" id="modal-feedback-toggle" aria-expanded="false">
+            O que você gostaria que essa ferramenta fizesse por você?
+          </button>
+          <textarea
+            id="modal-feedback"
+            class="modal-feedback-textarea"
+            placeholder="Descreva livremente — sua opinião vai moldar o produto."
+            rows="3"
+            aria-label="Feedback"
+          ></textarea>
+        </div>
+
         <button id="modal-submit-btn" class="modal-submit" type="button">
           <span class="modal-submit__label"></span>
           <span class="modal-submit__spinner" aria-hidden="true"></span>
