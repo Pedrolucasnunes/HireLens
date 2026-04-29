@@ -350,7 +350,7 @@ function showSuccess() {
 
     // Atualiza posição na lista
     if (modal.successPos) {
-      modal.successPos.textContent = `Você é a pessoa nº ${waitlistCount} na lista`;
+      modal.successPos.textContent = `#${waitlistCount} na lista de acesso antecipado`;
     }
 
     // Exibe sucesso com animação
