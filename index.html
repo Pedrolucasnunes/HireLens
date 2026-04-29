@@ -77,6 +77,7 @@
             class="modal-feedback-textarea"
             placeholder="Descreva livremente — sua opinião vai moldar o produto."
             rows="3"
+            maxlength="1000"
             aria-label="Feedback"
           ></textarea>
         </div>
@@ -714,7 +715,11 @@
 
 
 <!-- Supabase — CDN (deve vir ANTES de script.js) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"
+  integrity="sha384-2zrRDgDHSYB/GN3nFW3fsZXoxEhKIr3N2h63Tc6DEOB9JJdFIu8xMJT2Cph/gBil"
+  crossorigin="anonymous"
+></script>
 
 <!-- Scripts — carregado no final para não bloquear renderização -->
 <script src="script.js"></script>
