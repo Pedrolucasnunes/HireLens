@@ -337,9 +337,10 @@ function setSubmitIdle() {
 /**
  * Transição de formulário → estado de sucesso.
  * Usa fade-out do form antes de exibir o sucesso.
+ * @param {number} [position] Posição real na lista (vinda da API)
  */
-function showSuccess() {
-  waitlistCount += 1;
+function showSuccess(position) {
+  waitlistCount = position ?? (waitlistCount + 1);
 
   // Fade-out do formulário
   modal.formState.classList.add('is-hiding');
@@ -389,41 +390,30 @@ const supabaseClient = (typeof window.supabase !== 'undefined')
 
 
 /**
- * Envia os dados do lead para a tabela "leads" no Supabase.
+ * Envia os dados do lead para a Edge Function "waitlist" no Supabase.
+ * A função cuida de inserir no banco e disparar o email de confirmação.
  *
- * Campos gravados:
- *   name     → nome completo
- *   email    → e-mail (único por registro)
- *   company  → empresa
- *   plan     → plano selecionado (Starter | Growth | Enterprise | demo | login)
- *   origin   → URL da página que originou o lead
- *   created_at → preenchido automaticamente pelo Supabase (default: now())
- *
- * @param {{ name: string, email: string, company: string, plan: string }} data
- * @returns {Promise<void>}  Resolve se salvo com sucesso, rejeita com Error em qualquer falha.
+ * @param {{ name: string, email: string, company: string, feedback: string, plan: string }} data
+ * @returns {Promise<{ position: number }>}
  */
 async function submitToAPI(data) {
-  // Fallback: se o CDN do Supabase não carregou, lança erro imediatamente
-  if (!supabaseClient) {
-    throw new Error('Supabase SDK não disponível.');
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/hyper-handler`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'apikey': SUPABASE_KEY,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json.error || 'Erro ao enviar');
   }
 
-  const { error } = await supabaseClient
-    .from('leads')
-    .insert([
-      {
-        name:     data.name     || null,
-        email:    data.email,
-        company:  data.company  || null,
-        plan:     data.plan,
-        feedback: data.feedback || null,
-      },
-    ]);
-
-  // Supabase retorna { data, error } — lança o erro para o .catch() do caller
-  if (error) {
-    throw new Error(error.message);
-  }
+  return json; // { success: true, position }
 }
 
 /**
@@ -453,8 +443,8 @@ function handleModalSubmit() {
   setSubmitLoading();
 
   submitToAPI({ name, email, company, feedback, plan: activePlan })
-    .then(() => {
-      showSuccess();
+    .then((result) => {
+      showSuccess(result.position);
     })
     .catch(() => {
       setSubmitIdle();
