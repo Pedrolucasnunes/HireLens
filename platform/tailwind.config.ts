@@ -44,6 +44,34 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // TalentLens brand palette
+        ink: {
+          DEFAULT: "#0e0e0d",
+          50: "#1a1a17",
+          100: "#141412",
+          200: "#1f1f1c",
+          300: "#2a2a26",
+        },
+        cream: {
+          DEFAULT: "#f0ead8",
+          dim: "#a09880",
+          text: "#c8c0ad",
+          muted: "#6a6459",
+        },
+        amber: {
+          DEFAULT: "#e8a840",
+          dim: "#b07e28",
+          hover: "#f0b84c",
+        },
+        signal: {
+          green: "#3ea87a",
+          red: "#c94b3e",
+        },
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -59,10 +87,35 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        scan: {
+          "0%, 100%": { top: "0%" },
+          "50%": { top: "100%" },
+        },
+        "scan-x": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        "pulse-amber": {
+          "0%, 100%": { opacity: "0.6", boxShadow: "0 0 0 0 rgba(232,168,64,0.4)" },
+          "50%": { opacity: "1", boxShadow: "0 0 0 6px rgba(232,168,64,0)" },
+        },
+        "bar-grow": {
+          from: { width: "0" },
+          to: { width: "var(--w)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.6s cubic-bezier(.22,1,.36,1) both",
+        scan: "scan 4s ease-in-out infinite",
+        "scan-x": "scan-x 2.4s ease-in-out infinite",
+        "pulse-amber": "pulse-amber 2.2s ease-in-out infinite",
+        "bar-grow": "bar-grow 1s cubic-bezier(.22,1,.36,1) both",
       },
     },
   },
