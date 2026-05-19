@@ -7,6 +7,12 @@ export interface Job {
   candidate_count?: number
 }
 
+export interface JobWithStats extends Job {
+  candidate_count: number
+  avg_score: number | null
+  last_analysis_at: string | null
+}
+
 export interface CandidateAnalysis {
   summary: string
   strengths: string[]
