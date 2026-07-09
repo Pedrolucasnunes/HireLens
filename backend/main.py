@@ -13,6 +13,7 @@ import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -149,6 +150,27 @@ def embeddings(entrada: EntradaEmbedding):
     return {"modelo": MODELO_EMBEDDINGS, "dimensoes": len(vetor), "embedding": vetor.tolist()}
 
 
-# Interface de demonstração servida em / — montada por último para
-# que as rotas da API definidas acima tenham precedência.
-app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")
+# ── Frontend ─────────────────────────────────────────────────────────
+# Um único servidor: landing page em /, interface do agente em /app,
+# API nas rotas acima. Registrado por último para a API ter precedência.
+
+RAIZ_REPO = Path(__file__).resolve().parent.parent
+
+# Somente estes arquivos da raiz do repositório são expostos —
+# nunca montar a raiz inteira como StaticFiles (vazaria backend/.env).
+ARQUIVOS_LANDING = {"script.js", "styles.css", "talentlens-mark-512.png"}
+
+
+@app.get("/", include_in_schema=False)
+def landing():
+    return FileResponse(RAIZ_REPO / "index.html")
+
+
+app.mount("/app", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="app")
+
+
+@app.get("/{arquivo}", include_in_schema=False)
+def assets_landing(arquivo: str):
+    if arquivo in ARQUIVOS_LANDING:
+        return FileResponse(RAIZ_REPO / arquivo)
+    raise HTTPException(status_code=404, detail="Não encontrado")
