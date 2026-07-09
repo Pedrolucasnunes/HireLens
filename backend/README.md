@@ -19,9 +19,15 @@ copy .env.example .env        # e preencher OPENAI_API_KEY
 uvicorn main:app --reload
 ```
 
-Docs interativas (Swagger): http://localhost:8000/docs
+O servidor serve tudo em um lugar só:
 
-## Endpoints
+| Rota | O que é |
+|---|---|
+| `/` | Landing page |
+| `/app` | Interface do agente (colar vaga + currículo → análise) |
+| `/docs` | Docs interativas da API (Swagger) |
+
+## Endpoints da API
 
 | Endpoint | Entrada | Saída |
 |---|---|---|

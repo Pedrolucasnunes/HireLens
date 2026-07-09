@@ -20,8 +20,10 @@ LLM (gpt-4o-mini) recebe textos + score → parecer estruturado
 
 | Pasta | Descrição |
 |---|---|
-| `backend/` | Agente de IA — API em Python (FastAPI) |
+| `backend/` | Agente de IA — API em Python (FastAPI) + interface web |
 | raiz (`index.html`, `script.js`, `styles.css`) | Landing page |
+
+O FastAPI serve tudo em um único servidor: landing page em `/`, interface do agente em `/app` e a API (`/analisar`, `/embeddings`).
 
 ## Rodar o agente
 
