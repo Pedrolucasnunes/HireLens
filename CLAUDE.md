@@ -8,11 +8,25 @@ Nunca commitar código da plataforma direto na `main`.
 
 ## Stack da Plataforma
 - **Frontend**: Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
-- **Auth + DB**: Supabase (projeto: `lvuxstpmbumxqolvamlo`)
+- **Auth + DB**: Supabase (projeto: `nqlqlqkgevqzguvbuxpt`)
 - **IA**: Anthropic API — modelo `claude-sonnet-4-6`
 - **PDF**: pdf-parse (importado via `require()` por incompatibilidade ESM)
 
-## Rodar Localmente
+## Backend Python — Agente de IA (`backend/`)
+API FastAPI que analisa aderência currículo × vaga: embeddings (OpenAI `text-embedding-3-small`) → similaridade de cosseno (numpy) → parecer estruturado via LLM (`gpt-4o-mini`).
+
+**Decisão de arquitetura: o backend do agente de IA é Python/FastAPI. Não migrar nem portar para Node/TypeScript.**
+
+```bash
+cd backend
+.venv\Scripts\activate
+uvicorn main:app --reload
+```
+- Env: `backend/.env` com `OPENAI_API_KEY` (não vai para o git)
+- Endpoints: `POST /analisar`, `POST /embeddings`, `GET /health` — docs em `http://localhost:8000/docs`
+- Detalhes em `backend/README.md`
+
+## Rodar Localmente (plataforma Next.js)
 ```bash
 cd platform
 npm run dev
@@ -22,7 +36,7 @@ Acesse em `http://localhost:3000`.
 ## Variáveis de Ambiente
 Arquivo: `platform/.env.local` (não vai para o git)
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://lvuxstpmbumxqolvamlo.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://nqlqlqkgevqzguvbuxpt.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<chave anon do Supabase>
 ANTHROPIC_API_KEY=<chave da Anthropic>
 ```
