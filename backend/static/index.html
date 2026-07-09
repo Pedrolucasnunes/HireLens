@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentLens — Análise de Aderência</title>
+  <style>
+    :root {
+      --bg: #0e0e0d;
+      --surface: #1f1f1c;
+      --border: #2a2a26;
+      --amber: #e8a840;
+      --amber-hover: #f0b84c;
+      --cream: #f0ead8;
+      --text: #c8c0ad;
+      --muted: #6a6459;
+      --danger: #c94b3e;
+      --green: #3ea87a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    header { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.5rem; }
+    h1 { color: var(--cream); font-size: 1.6rem; letter-spacing: -0.02em; }
+    h1 span { color: var(--amber); }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    label { display: block; color: var(--cream); font-size: 0.85rem; margin-bottom: 0.4rem; font-weight: 600; }
+    textarea {
+      width: 100%; min-height: 260px; resize: vertical;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.9rem; font-size: 0.9rem; line-height: 1.5; font-family: inherit;
+    }
+    textarea:focus { outline: none; border-color: var(--amber); }
+    .actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; }
+    button {
+      background: var(--amber); color: #1a1508; border: none; border-radius: 8px;
+      padding: 0.8rem 2rem; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    }
+    button:hover { background: var(--amber-hover); }
+    button:disabled { opacity: 0.5; cursor: wait; }
+    .link { background: none; border: none; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 0.85rem; padding: 0; font-weight: 400; }
+    .link:hover { color: var(--text); background: none; }
+    .erro {
+      display: none; margin-top: 1.5rem; padding: 1rem;
+      border: 1px solid var(--danger); border-radius: 8px; color: var(--danger); font-size: 0.9rem;
+    }
+    #resultado { display: none; margin-top: 2rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+    .topo { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .score-num { font-size: 2.6rem; font-weight: 800; color: var(--cream); line-height: 1; }
+    .score-rotulo { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
+    .badge { padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; }
+    .badge.avancar { background: rgba(62,168,122,0.15); color: var(--green); border: 1px solid var(--green); }
+    .badge.ressalvas { background: rgba(232,168,64,0.12); color: var(--amber); border: 1px solid var(--amber); }
+    .badge.nao { background: rgba(201,75,62,0.12); color: var(--danger); border: 1px solid var(--danger); }
+    .parecer { line-height: 1.65; margin-bottom: 1.5rem; }
+    .pontos { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media (max-width: 720px) { .pontos { grid-template-columns: 1fr; } }
+    .pontos h3 { font-size: 0.85rem; color: var(--cream); margin-bottom: 0.6rem; }
+    .pontos ul { list-style: none; }
+    .pontos li { font-size: 0.88rem; line-height: 1.5; margin-bottom: 0.5rem; padding-left: 1.4rem; position: relative; }
+    .pontos li::before { position: absolute; left: 0; font-weight: 700; }
+    .fortes li::before { content: "✓"; color: var(--green); }
+    .fracos li::before { content: "✗"; color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header><h1>Talent<span>Lens</span></h1></header>
+    <p class="subtitle">Agente de IA — analisa a aderência entre um currículo e uma vaga usando embeddings, similaridade semântica e LLM.</p>
+
+    <div class="grid">
+      <div>
+        <label for="vaga">Descrição da vaga</label>
+        <textarea id="vaga" placeholder="Cole aqui a descrição da vaga: requisitos, responsabilidades, senioridade..."></textarea>
+      </div>
+      <div>
+        <label for="curriculo">Currículo (texto)</label>
+        <textarea id="curriculo" placeholder="Cole aqui o texto do currículo do candidato..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="analisar">Analisar aderência</button>
+      <button class="link" id="exemplo">preencher com exemplo</button>
+    </div>
+
+    <div class="erro" id="erro"></div>
+
+    <div id="resultado">
+      <div class="card">
+        <div class="topo">
+          <div>
+            <div class="score-num" id="score">—</div>
+            <div class="score-rotulo">similaridade semântica (0–100)</div>
+          </div>
+          <span class="badge" id="recomendacao"></span>
+        </div>
+        <p class="parecer" id="parecer"></p>
+        <div class="pontos">
+          <div class="fortes"><h3>Pontos fortes</h3><ul id="fortes"></ul></div>
+          <div class="fracos"><h3>Pontos de atenção</h3><ul id="fracos"></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const EXEMPLO_VAGA = `Desenvolvedor(a) Backend Python — Pleno
+
+Responsabilidades: desenvolver e manter APIs REST em Python (FastAPI ou Django), integrar serviços de terceiros, modelar dados em PostgreSQL.
+
+Requisitos: 2+ anos com Python; experiência com FastAPI ou Django; SQL e PostgreSQL; Git; APIs REST. Diferenciais: experiência com IA/LLMs, Docker, AWS.`;
+
+    const EXEMPLO_CURRICULO = `Maria Silva — Desenvolvedora Backend
+
+Experiência:
+- Dev Backend na Acme (2023–hoje): APIs em Python com FastAPI, PostgreSQL, integração com gateways de pagamento e serviços de e-mail. Implementei análise de documentos com a API da OpenAI.
+- Estágio na Beta Corp (2022–2023): scripts de automação em Python, ETL de dados com pandas.
+
+Formação: Sistemas de Informação (2023). Habilidades: Python, FastAPI, PostgreSQL, Git, Docker básico, inglês intermediário.`;
+
+    $("exemplo").addEventListener("click", () => {
+      $("vaga").value = EXEMPLO_VAGA;
+      $("curriculo").value = EXEMPLO_CURRICULO;
+    });
+
+    function badgeClasse(recomendacao) {
+      const r = (recomendacao || "").toLowerCase();
+      if (r.includes("avançar") && !r.includes("não")) return "avancar";
+      if (r.includes("ressalva")) return "ressalvas";
+      return "nao";
+    }
+
+    $("analisar").addEventListener("click", async () => {
+      const botao = $("analisar");
+      $("erro").style.display = "none";
+      $("resultado").style.display = "none";
+      botao.disabled = true;
+      botao.textContent = "Analisando…";
+
+      try {
+        const resposta = await fetch("/analisar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ curriculo: $("curriculo").value, vaga: $("vaga").value }),
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          const detalhe = Array.isArray(dados.detail)
+            ? "Preencha os dois campos (mínimo de 30 caracteres cada)."
+            : dados.detail;
+          throw new Error(detalhe || `Erro HTTP ${resposta.status}`);
+        }
+
+        $("score").textContent = dados.score.toFixed(1);
+        $("parecer").textContent = dados.parecer;
+        const badge = $("recomendacao");
+        badge.textContent = dados.recomendacao;
+        badge.className = "badge " + badgeClasse(dados.recomendacao);
+        $("fortes").innerHTML = dados.pontos_fortes.map((p) => `<li></li>`).join("");
+        [...$("fortes").children].forEach((li, i) => (li.textContent = dados.pontos_fortes[i]));
+        $("fracos").innerHTML = dados.pontos_fracos.map((p) => `<li></li>`).join("");
+        [...$("fracos").children].forEach((li, i) => (li.textContent = dados.pontos_fracos[i]));
+        $("resultado").style.display = "block";
+      } catch (erro) {
+        $("erro").textContent = erro.message;
+        $("erro").style.display = "block";
+      } finally {
+        botao.disabled = false;
+        botao.textContent = "Analisar aderência";
+      }
+    });
+  </script>
+</body>
+</html>

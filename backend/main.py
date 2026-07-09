@@ -7,11 +7,13 @@ LLM gera parecer estruturado → score + parecer + pontos fortes/fracos.
 
 import json
 import os
+from pathlib import Path
 
 import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
@@ -145,3 +147,8 @@ def embeddings(entrada: EntradaEmbedding):
         raise HTTPException(status_code=502, detail=f"Falha na chamada de IA: {erro}") from erro
 
     return {"modelo": MODELO_EMBEDDINGS, "dimensoes": len(vetor), "embedding": vetor.tolist()}
+
+
+# Interface de demonstração servida em / — montada por último para
+# que as rotas da API definidas acima tenham precedência.
+app.mount("/", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="static")
