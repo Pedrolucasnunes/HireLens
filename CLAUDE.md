@@ -23,7 +23,8 @@ cd backend
 uvicorn main:app --reload
 ```
 - Env: `backend/.env` com `OPENAI_API_KEY` (não vai para o git)
-- Endpoints: `POST /analisar`, `POST /embeddings`, `GET /health` — docs em `http://localhost:8000/docs`
+- O FastAPI serve tudo: landing em `/`, interface do agente em `/app` (arquivos em `backend/static/`), API em `POST /analisar`, `POST /embeddings`, `GET /health` — docs em `http://localhost:8000/docs`
+- Nunca montar a raiz do repo como StaticFiles (vazaria `backend/.env`) — a landing é servida por whitelist de arquivos
 - Detalhes em `backend/README.md`
 
 ## Rodar Localmente (plataforma Next.js)
