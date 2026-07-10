@@ -2,7 +2,9 @@
 TalentLens — agente de IA para triagem de currículos.
 
 Fluxo: currículo + vaga → embeddings → similaridade de cosseno →
-LLM gera parecer estruturado → score + parecer + pontos fortes/fracos.
+recupera análises anteriores similares (memória vetorial, se configurada) →
+LLM gera parecer estruturado → score + parecer + pontos fortes/fracos →
+análise salva na memória para calibrar pareceres futuros.
 """
 
 import json
@@ -17,6 +19,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
+
+import memoria
 
 load_dotenv()
 
@@ -96,20 +100,36 @@ Responda APENAS com JSON válido neste formato:
 Considere requisitos técnicos, experiência e senioridade. Seja específico: cite evidências do currículo."""
 
 
-def gerar_parecer(curriculo: str, vaga: str, score: float) -> dict:
+def formatar_contexto(analises: list[dict]) -> str:
+    """Seção de calibração do prompt com pareceres de currículos similares já analisados."""
+    linhas = [
+        "## Calibração — análises anteriores de currículos parecidos",
+        "Use como referência de rigor e consistência; não copie o conteúdo:",
+    ]
+    for analise in analises:
+        parecer = analise.get("parecer") or {}
+        linhas.append(
+            f"- Vaga: {analise.get('vaga_texto', '')[:200]} | Score: {analise.get('score')} | "
+            f"Parecer: {parecer.get('parecer', '')} | Recomendação: {parecer.get('recomendacao', '')}"
+        )
+    return "\n".join(linhas)
+
+
+def gerar_parecer(curriculo: str, vaga: str, score: float, contexto: list[dict] | None = None) -> dict:
+    conteudo = (
+        f"Similaridade semântica entre currículo e vaga (embeddings, 0 a 100): {score}\n\n"
+        f"## Vaga\n{vaga}\n\n## Currículo\n{curriculo}"
+    )
+    if contexto:
+        conteudo += "\n\n" + formatar_contexto(contexto)
+
     resposta = cliente_openai().chat.completions.create(
         model=MODELO_LLM,
         response_format={"type": "json_object"},
         temperature=0.3,
         messages=[
             {"role": "system", "content": PROMPT_PARECER},
-            {
-                "role": "user",
-                "content": (
-                    f"Similaridade semântica entre currículo e vaga (embeddings, 0 a 100): {score}\n\n"
-                    f"## Vaga\n{vaga}\n\n## Currículo\n{curriculo}"
-                ),
-            },
+            {"role": "user", "content": conteudo},
         ],
     )
     return json.loads(resposta.choices[0].message.content)
@@ -128,11 +148,22 @@ def analisar(entrada: EntradaAnalise):
     try:
         emb_curriculo, emb_vaga = gerar_embeddings([entrada.curriculo, entrada.vaga])
         score = round(similaridade_cosseno(emb_curriculo, emb_vaga) * 100, 1)
-        parecer = gerar_parecer(entrada.curriculo, entrada.vaga, score)
+        contexto = memoria.buscar_contexto_similar(emb_curriculo.tolist())
+        parecer = gerar_parecer(entrada.curriculo, entrada.vaga, score, contexto)
     except HTTPException:
         raise
     except Exception as erro:
         raise HTTPException(status_code=502, detail=f"Falha na chamada de IA: {erro}") from erro
+
+    # Alimenta a memória vetorial para calibrar análises futuras.
+    # Tolerante a falha: sem banco configurado, vira um no-op.
+    memoria.salvar_analise(
+        vaga=entrada.vaga,
+        curriculo=entrada.curriculo,
+        embedding_curriculo=emb_curriculo.tolist(),
+        score=round(score),
+        parecer=parecer,
+    )
 
     return ResultadoAnalise(
         score=score,

@@ -16,10 +16,16 @@ Embeddings dos dois textos (OpenAI text-embedding-3-small)
         ↓
 Similaridade semântica (cosine similarity, numpy)
         ↓
-LLM (gpt-4o-mini) recebe textos + score → parecer estruturado
+Recuperação de análises anteriores similares (RAG — Postgres + pgvector)
+        ↓
+LLM (gpt-4o-mini) recebe textos + score + histórico → parecer estruturado
         ↓
 { score, parecer, pontos_fortes, pontos_fracos, recomendacao }
+        ↓
+Análise salva no armazenamento vetorial para calibrar as próximas
 ```
+
+A memória vetorial é opcional: sem banco configurado, a análise roda normalmente, apenas sem o contexto histórico ([detalhes](backend/README.md#memória-de-análises-rag)).
 
 ## Demonstração
 
@@ -29,7 +35,7 @@ LLM (gpt-4o-mini) recebe textos + score → parecer estruturado
 
 | Camada | Stack | Papel |
 |---|---|---|
-| `backend/` | Python + FastAPI + OpenAI | **Motor de IA** — análise de aderência currículo × vaga (embeddings, similaridade, parecer via LLM) |
+| `backend/` | Python + FastAPI + OpenAI + Postgres (pgvector) | **Motor de IA** — análise de aderência currículo × vaga (embeddings, similaridade, parecer via LLM calibrado por análises anteriores) |
 | `landing/` | HTML/CSS/JS | Landing page de validação |
 
 O FastAPI serve tudo em um único servidor: landing page em `/`, interface do agente em `/app` e a API (`/analisar`, `/embeddings`).
@@ -49,4 +55,4 @@ Docs interativas em `http://localhost:8000/docs`. Detalhes e exemplos em [backen
 
 ## Status
 
-MVP em desenvolvimento ativo. Próximo passo: recuperação de análises anteriores como contexto do parecer (RAG com armazenamento vetorial).
+MVP em desenvolvimento ativo.
