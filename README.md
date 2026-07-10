@@ -18,23 +18,12 @@ LLM (gpt-4o-mini) recebe textos + score → parecer estruturado
 
 ## Arquitetura
 
-O repositório tem três camadas, cada uma com um papel definido:
-
 | Camada | Stack | Papel |
 |---|---|---|
 | `backend/` | Python + FastAPI + OpenAI | **Motor de IA** — análise de aderência currículo × vaga (embeddings, similaridade, parecer via LLM) |
-| `platform/` | Next.js 14 + TypeScript + Supabase | **Camada de produto** — autenticação, dashboard, gestão de vagas, upload de currículos em PDF |
 | `landing/` | HTML/CSS/JS | Landing page de validação |
 
-O FastAPI serve landing (`/`), interface do agente (`/app`) e API (`/analisar`, `/embeddings`) em um único servidor.
-
-> O logo (`talentlens-mark-512.png`) existe em `landing/` e em `platform/public/` de propósito: cada camada é deployada de forma independente e precisa do próprio arquivo para funcionar sozinha.
-
-### Estado atual e plano de consolidação
-
-Hoje existe uma redundância deliberada: a `platform/` tem sua própria chamada à API da Anthropic (Claude) para analisar currículos, enquanto o `backend/` faz a mesma análise de forma independente via OpenAI. Isso é resultado da ordem de construção — a plataforma nasceu primeiro como produto completo; o agente Python nasceu depois como motor de IA dedicado.
-
-O plano de consolidação: a `platform/` deixará de ter lógica de IA própria e passará a consumir a API do `backend/`. O Python se torna o único "cérebro" de IA do projeto; a plataforma fica responsável apenas por autenticação, banco de dados e interface. Duas stacks, uma fronteira clara: produto em Next.js, inteligência em Python.
+O FastAPI serve tudo em um único servidor: landing page em `/`, interface do agente em `/app` e a API (`/analisar`, `/embeddings`).
 
 ## Rodar o agente
 
@@ -49,16 +38,6 @@ uvicorn main:app --reload
 
 Docs interativas em `http://localhost:8000/docs`. Detalhes e exemplos em [backend/README.md](backend/README.md).
 
-## Rodar a plataforma
-
-```bash
-cd platform
-npm install
-npm run dev
-```
-
-Requer `platform/.env.local` com as chaves do Supabase e da Anthropic (ver `platform/README.md`) e a migration de `platform/supabase/migrations/` aplicada no projeto Supabase. Acesse em `http://localhost:3000`.
-
 ## Status
 
-MVP em desenvolvimento ativo. Próximos passos: recuperação de análises anteriores como contexto do parecer (RAG com armazenamento vetorial) e interface web integrada à API.
+MVP em desenvolvimento ativo. Próximo passo: recuperação de análises anteriores como contexto do parecer (RAG com armazenamento vetorial).
