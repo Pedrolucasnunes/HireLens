@@ -29,9 +29,14 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# Origens permitidas para CORS — por padrão, só a landing publicada.
+# Em dev, sobrescreva via env: CORS_ORIGENS=http://localhost:3000,...
+# (chamadas same-origin — landing e /app servidos por este servidor — não precisam de CORS)
+CORS_ORIGENS = os.getenv("CORS_ORIGENS", "https://hire-lens-rust.vercel.app").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGENS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -41,8 +46,8 @@ app.add_middleware(
 
 
 class EntradaAnalise(BaseModel):
-    curriculo: str = Field(min_length=30, description="Texto do currículo")
-    vaga: str = Field(min_length=30, description="Descrição da vaga")
+    curriculo: str = Field(min_length=30, max_length=20_000, description="Texto do currículo")
+    vaga: str = Field(min_length=30, max_length=20_000, description="Descrição da vaga")
 
 
 class ResultadoAnalise(BaseModel):
@@ -54,7 +59,7 @@ class ResultadoAnalise(BaseModel):
 
 
 class EntradaEmbedding(BaseModel):
-    texto: str = Field(min_length=1)
+    texto: str = Field(min_length=1, max_length=20_000)
 
 
 # ── IA ───────────────────────────────────────────────────────────────
