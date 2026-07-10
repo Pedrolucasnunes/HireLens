@@ -44,3 +44,19 @@ curl -X POST http://localhost:8000/analisar \
 ```
 
 O `score` é a similaridade de cosseno entre os embeddings do currículo e da vaga, em escala 0–100. O parecer é gerado pelo LLM recebendo os dois textos e o score como contexto.
+
+## Testes
+
+```bash
+pip install -r requirements-dev.txt
+pytest -v
+```
+
+As chamadas à OpenAI são simuladas nos testes — nada de custo de API nem chave necessária. O CI (GitHub Actions) roda a suíte a cada push.
+
+## Configuração
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `OPENAI_API_KEY` | sim | Chave da OpenAI (embeddings + parecer) |
+| `CORS_ORIGENS` | não | Origens permitidas para CORS, separadas por vírgula. Padrão: só a landing publicada. Same-origin (landing e `/app` servidos pelo próprio FastAPI) não precisa de CORS. |

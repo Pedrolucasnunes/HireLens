@@ -1,10 +1,10 @@
 # HireLens / TalentLens — Contexto do Projeto
 
 ## Estrutura de Branches
-- `main` → landing page de validação (arquivo estático: `index.html`, `script.js`, `styles.css`)
-- `mvp` → landing page + plataforma completa (`platform/`)
+- `main` → branch principal com o projeto completo: landing page (raiz), agente de IA (`backend/`) e plataforma (`platform/`)
+- `mvp` → espelho da `main` (mantida sincronizada por histórico; trabalho novo vai na `main`)
 
-Nunca commitar código da plataforma direto na `main`.
+Desde 2026-07-09 a `platform/` faz parte da `main` por decisão deliberada — não removê-la nem escondê-la. Ver a seção "Arquitetura" do README raiz para o papel de cada camada e o plano de consolidação (plataforma consumirá a API Python; o `backend/` é o único motor de IA).
 
 ## Stack da Plataforma
 - **Frontend**: Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
@@ -25,6 +25,8 @@ uvicorn main:app --reload
 - Env: `backend/.env` com `OPENAI_API_KEY` (não vai para o git)
 - O FastAPI serve tudo: landing em `/`, interface do agente em `/app` (arquivos em `backend/static/`), API em `POST /analisar`, `POST /embeddings`, `GET /health` — docs em `http://localhost:8000/docs`
 - Nunca montar a raiz do repo como StaticFiles (vazaria `backend/.env`) — a landing é servida por whitelist de arquivos
+- Testes: `cd backend && pytest` (OpenAI mockada, sem custo); CI roda a suíte a cada push
+- CORS restrito por padrão à landing publicada; origens extras via env `CORS_ORIGENS`
 - Detalhes em `backend/README.md`
 
 ## Rodar Localmente (plataforma Next.js)
