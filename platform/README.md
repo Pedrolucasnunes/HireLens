@@ -38,6 +38,7 @@ Para login por e-mail/senha sem fricção em dev, desative **Confirm email** em 
 | `/vagas` | Server | Lista de vagas |
 | `/vagas/new` | Client | Criar nova vaga |
 | `/vagas/[id]` | Server | Detalhe da vaga + upload de currículos + ranking |
+| `/candidatos` | Server | Todos os candidatos do usuário, ranqueados por score |
 | `/api/jobs` | API | CRUD de vagas |
 | `/api/analyze` | API | Upload PDF → extração → Claude → salva candidato |
 | `/api/auth/signout` | API | Logout |

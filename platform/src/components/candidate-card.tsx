@@ -12,9 +12,11 @@ const RECOMMENDATION_LABEL = {
 interface CandidateCardProps {
   candidate: Candidate;
   rank: number;
+  /** Título da vaga — exibido apenas em listas globais, fora do contexto de uma vaga */
+  jobTitle?: string;
 }
 
-export function CandidateCard({ candidate, rank }: CandidateCardProps) {
+export function CandidateCard({ candidate, rank, jobTitle }: CandidateCardProps) {
   const analysis = candidate.analysis;
   const score = candidate.score ?? 0;
   const rec = analysis?.recommendation ? RECOMMENDATION_LABEL[analysis.recommendation] : null;
@@ -32,6 +34,11 @@ export function CandidateCard({ candidate, rank }: CandidateCardProps) {
                 {candidate.name ?? candidate.filename.replace(".pdf", "")}
               </p>
               {rec && <Badge variant={rec.variant}>{rec.label}</Badge>}
+              {jobTitle && (
+                <span className="font-mono text-[11px] text-muted-foreground truncate max-w-[240px]">
+                  / {jobTitle}
+                </span>
+              )}
             </div>
             {analysis?.summary && (
               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">

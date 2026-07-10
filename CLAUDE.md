@@ -56,6 +56,7 @@ Tabelas: `jobs` e `candidates`, ambas com RLS habilitado.
 | `/vagas` | Server | Lista de vagas |
 | `/vagas/new` | Client | Criar nova vaga |
 | `/vagas/[id]` | Server | Detalhe da vaga + upload + ranking |
+| `/candidatos` | Server | Todos os candidatos do usuário, ranqueados por score |
 | `/api/jobs` | API | CRUD de vagas |
 | `/api/analyze` | API | Upload PDF → extração → Claude → salva candidato |
 | `/api/auth/signout` | API | Logout |
