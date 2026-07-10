@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalentLens — Plataforma
 
-## Getting Started
+Camada de produto do TalentLens: autenticação, dashboard de vagas, upload de currículos em PDF e análise com IA (Claude). Construída com Next.js 14 (App Router), Tailwind CSS, shadcn/ui e Supabase (auth + banco).
 
-First, run the development server:
+Este é o produto completo do TalentLens — complementar ao agente de IA em Python que vive em [`backend/`](../backend/README.md). O papel de cada camada e o plano de consolidação estão na seção [Arquitetura do README raiz](../README.md#arquitetura).
+
+## Rodar localmente
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse em `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Crie um `.env.local` a partir do [`.env.example`](.env.example):
 
-## Learn More
+| Variável | Descrição |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave `anon public` do Supabase (Settings → API) |
+| `ANTHROPIC_API_KEY` | Chave da API da Anthropic (análise de currículos) |
 
-To learn more about Next.js, take a look at the following resources:
+### Banco de dados (obrigatório antes de usar)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Rode o SQL de [`supabase/migrations/001_initial.sql`](supabase/migrations/001_initial.sql) no **SQL Editor** do Supabase. Ele cria as tabelas `jobs` e `candidates`, ambas com RLS habilitado.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para login por e-mail/senha sem fricção em dev, desative **Confirm email** em Authentication → Sign In / Providers → Email.
 
-## Deploy on Vercel
+## Rotas principais
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Rota | Tipo | Descrição |
+|---|---|---|
+| `/login` | Client | Auth e-mail/senha via Supabase |
+| `/dashboard` | Server | Visão geral das vagas do usuário |
+| `/vagas` | Server | Lista de vagas |
+| `/vagas/new` | Client | Criar nova vaga |
+| `/vagas/[id]` | Server | Detalhe da vaga + upload de currículos + ranking |
+| `/api/jobs` | API | CRUD de vagas |
+| `/api/analyze` | API | Upload PDF → extração → Claude → salva candidato |
+| `/api/auth/signout` | API | Logout |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notas técnicas
+
+- `pdf-parse` é importado via `require()` (incompatibilidade ESM)
+- Componentes interativos (`useRouter` etc.) ficam em arquivos separados com `"use client"`
+- Após upload de currículo, `router.refresh()` re-renderiza o Server Component com os dados novos
