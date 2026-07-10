@@ -1,5 +1,10 @@
 # TalentLens
 
+![CI](https://github.com/Pedrolucasnunes/TalentLens/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.13-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.139-teal)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 Triagem de currículos com IA: o agente analisa a aderência entre um currículo e uma vaga e gera um parecer estruturado com score, pontos fortes/fracos e recomendação.
 
 ## Como funciona
@@ -15,6 +20,10 @@ LLM (gpt-4o-mini) recebe textos + score → parecer estruturado
         ↓
 { score, parecer, pontos_fortes, pontos_fracos, recomendacao }
 ```
+
+## Demonstração
+
+<!-- SCREENSHOT: interface do agente em /app, mostrando currículo + vaga + parecer gerado -->
 
 ## Arquitetura
 

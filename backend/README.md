@@ -43,6 +43,23 @@ curl -X POST http://localhost:8000/analisar \
   -d '{"curriculo": "Desenvolvedor Python com 3 anos de experiência em FastAPI e PostgreSQL...", "vaga": "Vaga para desenvolvedor backend Python pleno com FastAPI..."}'
 ```
 
+Resposta:
+
+```json
+{
+  "score": 78.4,
+  "parecer": "O candidato tem boa aderência técnica à vaga, com experiência sólida em FastAPI e PostgreSQL, o stack principal pedido. A senioridade declarada é compatível com a posição de nível pleno.",
+  "pontos_fortes": [
+    "Experiência direta com o stack pedido (FastAPI, PostgreSQL)",
+    "Histórico de projetos em produção"
+  ],
+  "pontos_fracos": [
+    "Não menciona experiência com filas ou processamento assíncrono"
+  ],
+  "recomendacao": "Avançar para entrevista"
+}
+```
+
 O `score` é a similaridade de cosseno entre os embeddings do currículo e da vaga, em escala 0–100. O parecer é gerado pelo LLM recebendo os dois textos e o score como contexto.
 
 ## Testes
