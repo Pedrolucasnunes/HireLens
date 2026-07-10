@@ -159,16 +159,16 @@ def embeddings(entrada: EntradaEmbedding):
 # Um único servidor: landing page em /, interface do agente em /app,
 # API nas rotas acima. Registrado por último para a API ter precedência.
 
-RAIZ_REPO = Path(__file__).resolve().parent.parent
+DIR_LANDING = Path(__file__).resolve().parent.parent / "landing"
 
-# Somente estes arquivos da raiz do repositório são expostos —
-# nunca montar a raiz inteira como StaticFiles (vazaria backend/.env).
+# Somente estes arquivos da landing são expostos — manter a whitelist
+# em vez de montar diretórios fora de backend/ como StaticFiles.
 ARQUIVOS_LANDING = {"script.js", "styles.css", "talentlens-mark-512.png"}
 
 
 @app.get("/", include_in_schema=False)
 def landing():
-    return FileResponse(RAIZ_REPO / "index.html")
+    return FileResponse(DIR_LANDING / "index.html")
 
 
 app.mount("/app", StaticFiles(directory=Path(__file__).parent / "static", html=True), name="app")
@@ -177,5 +177,5 @@ app.mount("/app", StaticFiles(directory=Path(__file__).parent / "static", html=T
 @app.get("/{arquivo}", include_in_schema=False)
 def assets_landing(arquivo: str):
     if arquivo in ARQUIVOS_LANDING:
-        return FileResponse(RAIZ_REPO / arquivo)
+        return FileResponse(DIR_LANDING / arquivo)
     raise HTTPException(status_code=404, detail="Não encontrado")

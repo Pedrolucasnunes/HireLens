@@ -24,9 +24,11 @@ O repositório tem três camadas, cada uma com um papel definido:
 |---|---|---|
 | `backend/` | Python + FastAPI + OpenAI | **Motor de IA** — análise de aderência currículo × vaga (embeddings, similaridade, parecer via LLM) |
 | `platform/` | Next.js 14 + TypeScript + Supabase | **Camada de produto** — autenticação, dashboard, gestão de vagas, upload de currículos em PDF |
-| raiz (`index.html`, `script.js`, `styles.css`) | HTML/CSS/JS | Landing page de validação |
+| `landing/` | HTML/CSS/JS | Landing page de validação |
 
 O FastAPI serve landing (`/`), interface do agente (`/app`) e API (`/analisar`, `/embeddings`) em um único servidor.
+
+> O logo (`talentlens-mark-512.png`) existe em `landing/` e em `platform/public/` de propósito: cada camada é deployada de forma independente e precisa do próprio arquivo para funcionar sozinha.
 
 ### Estado atual e plano de consolidação
 

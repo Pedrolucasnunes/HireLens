@@ -1,7 +1,7 @@
 # HireLens / TalentLens — Contexto do Projeto
 
 ## Estrutura de Branches
-- `main` → branch principal com o projeto completo: landing page (raiz), agente de IA (`backend/`) e plataforma (`platform/`)
+- `main` → branch principal com o projeto completo: landing page (`landing/`), agente de IA (`backend/`) e plataforma (`platform/`)
 - `mvp` → espelho da `main` (mantida sincronizada por histórico; trabalho novo vai na `main`)
 
 Desde 2026-07-09 a `platform/` faz parte da `main` por decisão deliberada — não removê-la nem escondê-la. Ver a seção "Arquitetura" do README raiz para o papel de cada camada e o plano de consolidação (plataforma consumirá a API Python; o `backend/` é o único motor de IA).
@@ -52,9 +52,10 @@ Tabelas: `jobs` e `candidates`, ambas com RLS habilitado.
 | Rota | Tipo | Descrição |
 |---|---|---|
 | `/login` | Client | Auth email/senha |
-| `/dashboard` | Server | Lista de vagas do usuário |
-| `/jobs/new` | Client | Criar nova vaga |
-| `/jobs/[id]` | Server | Detalhe da vaga + upload + ranking |
+| `/dashboard` | Server | Visão geral das vagas do usuário |
+| `/vagas` | Server | Lista de vagas |
+| `/vagas/new` | Client | Criar nova vaga |
+| `/vagas/[id]` | Server | Detalhe da vaga + upload + ranking |
 | `/api/jobs` | API | CRUD de vagas |
 | `/api/analyze` | API | Upload PDF → extração → Claude → salva candidato |
 | `/api/auth/signout` | API | Logout |
