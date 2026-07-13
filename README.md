@@ -29,7 +29,7 @@ A memória vetorial é opcional: sem banco configurado, a análise roda normalme
 
 ## Demonstração
 
-<!-- SCREENSHOT: interface do agente em /app, mostrando currículo + vaga + parecer gerado -->
+![Demonstração do TalentLens](docs/screenshot-demo.png)
 
 ## Arquitetura
 
